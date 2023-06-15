@@ -1,0 +1,20 @@
+web1 ansible_host=host_IP
+web2 ansible_host=host_IP
+database1 ansible_host=host_IP
+web3 ansible_host=host_IP ansible_user=ubuntu
+
+[websvrgrp]
+web1
+web2
+web3
+
+[dbsvrgrp]
+database1
+
+[de_ohio:children]
+websvrgrp
+dbsvrgrp
+
+[de_ohio:vars]
+ansible_user=centos
+ansible_ssh_private_key_file="private-key.pem file"
