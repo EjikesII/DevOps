@@ -1,0 +1,53 @@
+- name: Provisioning Server
+  hosts: all
+  become: yes
+  tasks: 
+	- name: Install NTP on Centos
+	  yum:
+		name: "{{item}}"
+		state: present
+	  when: ansible_distribution == "CentOs" 
+      loop:
+        - httpd
+        - ntp
+        - wget
+        - git
+        - zip
+        - unzip
+      - name: Deploy NTP conf file for RedHat
+        template:
+            src: templates/ntp_redhat.conf.j2
+            dest: /etc/ntp.conf
+        when: ansible_os_family == "RedHat"
+        notify:
+          - Restart NTP on RedHat
+	
+	- name: Install NTP on Ubuntu
+	  apt:
+		  name: ntp
+		  state: present
+	  when: ansible_distribution == "Ubuntu"
+    
+    - name: Start & Enable NTP on RedHat
+      service: 
+        name: ntpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+      
+     - name: Start & Enabled on Debian
+       service: 
+         name: ntp 
+         state: started
+         enabled: yes 
+       when: ansible_os_family == "Debian"
+       - name: Deploy NTP conf file for Debian
+        template:
+            src: /etc/ntp_debian.conf.j2
+            dest: /etc/ntp.conf
+        when: ansible_os_family == "RedHat"
+        notify:
+          - Restart NTP on Debian
+     - name: Add users to user group
+     
+   handlers:
